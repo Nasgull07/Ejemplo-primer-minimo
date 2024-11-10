@@ -1,7 +1,9 @@
 package edu.upc.dsa;
 
-import edu.upc.dsa.exceptions.TrackNotFoundException;
-import edu.upc.dsa.models.Track;
+import edu.upc.dsa.exceptions.ProductNotFoundException;
+import edu.upc.dsa.models.Product;
+import edu.upc.dsa.models.Pedido;
+import edu.upc.dsa.ProductsManagerImpl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -10,94 +12,42 @@ import org.junit.Test;
 import java.util.List;
 
 public class TracksManagerTest {
-    TracksManager tm;
+    ProductManager tm;
 
     @Before
     public void setUp() {
-        this.tm = TracksManagerImpl.getInstance();
-        this.tm.addTrack("T1", "La Barbacoa", "Georgie Dann");
-        this.tm.addTrack("T2", "Despacito", "Luis Fonsi");
-        this.tm.addTrack("T3", "Ent3r S4ndm4n", "Metallica");
+        tm = new ProductsManagerImpl();
+        tm.RealizarPedido("1", List.of(new Product("Product1", 10, 2)), "Pedido1", 20);
+        tm.RealizarPedido("2", List.of(new Product("Product2", 15, 1)), "Pedido2", 15);
     }
 
     @After
     public void tearDown() {
-        // És un Singleton
-        this.tm.clear();
+        if (tm != null) {
+            tm.clear();
+        }
+        tm = null;
     }
 
     @Test
-    public void addTrackTest() {
-        Assert.assertEquals(3, tm.size());
-
-        this.tm.addTrack("La Vereda De La Puerta De Atrás", "Extremoduro");
-
-        Assert.assertEquals(4, tm.size());
-
+    public void testRealizarPedido() {
+        Pedido pedido = tm.RealizarPedido("3", List.of(new Product("Product3", 20, 1)), "Pedido3", 20);
+        Assert.assertNotNull(pedido);
+        Assert.assertEquals("3", pedido.getId());
+        Assert.assertEquals("Pedido3", pedido.getNombre());
+        Assert.assertEquals(20, pedido.getPrecio().intValue());
+        Assert.assertEquals(1, pedido.getProducts().size());
+        Assert.assertEquals("Product3", pedido.getProducts().get(0).getName());
     }
 
     @Test
-    public void getTrackTest() throws Exception {
-        Assert.assertEquals(3, tm.size());
-
-        Track t = this.tm.getTrack("T2");
-        Assert.assertEquals("Despacito", t.getTitle());
-        Assert.assertEquals("Luis Fonsi", t.getSinger());
-
-        t = this.tm.getTrack2("T2");
-        Assert.assertEquals("Despacito", t.getTitle());
-        Assert.assertEquals("Luis Fonsi", t.getSinger());
-
-        Assert.assertThrows(TrackNotFoundException.class, () ->
-                this.tm.getTrack2("XXXXXXX"));
-
-    }
-
-    @Test
-    public void getTracksTest() {
-        Assert.assertEquals(3, tm.size());
-        List<Track> tracks  = tm.findAll();
-
-        Track t = tracks.get(0);
-        Assert.assertEquals("La Barbacoa", t.getTitle());
-        Assert.assertEquals("Georgie Dann", t.getSinger());
-
-        t = tracks.get(1);
-        Assert.assertEquals("Despacito", t.getTitle());
-        Assert.assertEquals("Luis Fonsi", t.getSinger());
-
-        t = tracks.get(2);
-        Assert.assertEquals("Ent3r S4ndm4n", t.getTitle());
-        Assert.assertEquals("Metallica", t.getSinger());
-
-        Assert.assertEquals(3, tm.size());
-
-    }
-
-    @Test
-    public void updateTrackTest() {
-        Assert.assertEquals(3, tm.size());
-        Track t = this.tm.getTrack("T3");
-        Assert.assertEquals("Ent3r S4ndm4n", t.getTitle());
-        Assert.assertEquals("Metallica", t.getSinger());
-
-        t.setTitle("Enter Sandman");
-        this.tm.updateTrack(t);
-
-        t = this.tm.getTrack("T3");
-        Assert.assertEquals("Enter Sandman", t.getTitle());
-        Assert.assertEquals("Metallica", t.getSinger());
-    }
-
-
-    @Test
-    public void deleteTrackTest() {
-        Assert.assertEquals(3, tm.size());
-        this.tm.deleteTrack("T3");
-        Assert.assertEquals(2, tm.size());
-
-        Assert.assertThrows(TrackNotFoundException.class, () ->
-                this.tm.getTrack2("T3"));
-
+    public void testServirPedido() {
+        Pedido pedido = tm.ServirPedido("1", List.of(new Product("Product1", 10, 2)), "Pedido1", 20);
+        Assert.assertNotNull(pedido);
+        Assert.assertEquals("1", pedido.getId());
+        Assert.assertEquals("Pedido1", pedido.getNombre());
+        Assert.assertEquals(20, pedido.getPrecio().intValue());
+        Assert.assertEquals(1, pedido.getProducts().size());
+        Assert.assertEquals("Product1", pedido.getProducts().get(0).getName());
     }
 }
