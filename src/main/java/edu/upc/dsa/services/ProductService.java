@@ -18,34 +18,39 @@ import java.util.List;
         private ProductManager productManager;
 
         @GET
-        @Path("/list")
+        @Path("/list/products")
         @Produces(MediaType.APPLICATION_JSON)
         public List<Product> getProducts() {
-            return productManager.ListadoProductosPorVenta();
+            return  productManager.ListadoProductosPorVenta();
+
         }
 
         @GET
-        @Path("/list")
+        @Path("/list/productsPrecio")
         @Produces(MediaType.APPLICATION_JSON)
         public  List<Product> getProductsPrecio(){
-            return productManager.ListadoProductosPorPrecio();
+            return  productManager.ListadoProductosPorPrecio();
+
         }
 
         @GET
-        @Path("/list")
+        @Path("/list/pedidos")
         @Produces(MediaType.APPLICATION_JSON)
         public  List<Pedido> getPedidos(String name){
             return productManager.ListadoPedidos(name);
+
         }
 
         @POST
         @Path("/order")
         @Consumes(MediaType.APPLICATION_JSON)
         @Produces(MediaType.APPLICATION_JSON)
-        public Response realizarPedido(String id, String name, List<Product> product, Integer prize) {
-            Pedido newPedido = productManager.RealizarPedido(id, product, name, prize);
+        public Response realizarPedido(PedidoRequest pedidoRequest) {
+            Pedido newPedido = productManager.RealizarPedido(
+                    pedidoRequest.getId(), pedidoRequest.getProduct(), pedidoRequest.getName(), pedidoRequest.getPrize());
             return Response.status(Response.Status.CREATED).entity(newPedido).build();
         }
+
 
         @POST
         @Path("/serve")
